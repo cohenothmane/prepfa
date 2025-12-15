@@ -52,9 +52,7 @@ L’objectif est de créer une **communauté collaborative** où chacun peut sig
 
 ### Frontend
 
-* **HTML5**
-* **CSS3**
-* **JavaScript (Vanilla)**
+* **REACT**
 * **Google Maps API**
 
 ### Backend
