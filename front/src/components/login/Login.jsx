@@ -1,7 +1,16 @@
 import React from "react";
 import "./Login.css";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+  const navigate = useNavigate();
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    console.log('Login');
+    navigate('/home');
+  };
+
   return (
     <section className="login">
       <div className="login__wrapper">
@@ -45,7 +54,7 @@ const Login = () => {
               </a>
             </div>
 
-            <button type="submit" className="btn-primary">
+            <button type="submit" onClick={handleLogin} className="btn-primary">
               Se connecter
             </button>
 
