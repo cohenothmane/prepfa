@@ -2,10 +2,8 @@ import React, { useState } from "react";
 import "./Navbar.css";
 
 const NAV_LINKS = [
-  { label: "Accueil", href: "#accueil" },
-  { label: "Fonctionnalités", href: "#features" },
-  { label: "Tarifs", href: "#pricing" },
-  { label: "Contact", href: "#contact" },
+  { label: "Accueil", href: "/home" },
+  { label: "Carte", href: "/map" },
 ];
 
 const Navbar = () => {
@@ -14,7 +12,8 @@ const Navbar = () => {
   return (
     <header className="navbar">
       <div className="navbar__container">
-        <a className="navbar__brand" href="#accueil">
+        <a className="navbar__brand" href="/home">
+          <span className="navbar__logo-dot" />
           prepfa
         </a>
 
