@@ -1,21 +1,23 @@
-/* Palette principale */
+/* Palette principale revisitée */
 :root {
-  --bg: #0f172a;
+  --bg: #050816;
   --card: rgba(255, 255, 255, 0.06);
-  --text: #e2e8f0;
-  --muted: #94a3b8;
-  --accent: #22d3ee;
-  --accent-dark: #0ea5e9;
+  --text: #e8edf7;
+  --muted: #a6b3c9;
+  --accent: #4fd1c5;
+  --accent-2: #7c3aed;
   --border: rgba(255, 255, 255, 0.08);
+  --glow: 0 10px 30px rgba(124, 58, 237, 0.35);
 }
 
 .navbar {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgba(15, 23, 42, 0.9);
+  background: rgba(5, 8, 22, 0.92);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
+  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.45);
 }
 
 .navbar__container {
@@ -30,28 +32,27 @@
 
 .navbar__brand {
   font-weight: 800;
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   letter-spacing: -0.02em;
   color: var(--text);
   text-decoration: none;
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
-.navbar__brand::before {
-  content: "";
-  width: 32px;
-  height: 32px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-  box-shadow: 0 10px 30px rgba(14, 165, 233, 0.35);
+.navbar__logo-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  box-shadow: var(--glow);
 }
 
 .navbar__links {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 14px;
   color: var(--muted);
   transition: max-height 0.3s ease, opacity 0.3s ease;
 }
@@ -59,33 +60,35 @@
 .navbar__links a {
   color: var(--text);
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 600;
   padding: 10px 12px;
-  border-radius: 10px;
-  transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+  border-radius: 12px;
+  transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .navbar__links a:hover {
-  color: var(--accent);
-  background: var(--card);
+  color: #0b1220;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  box-shadow: var(--glow);
   transform: translateY(-1px);
 }
 
 .navbar__cta {
   border: none;
   padding: 10px 16px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
   color: #0b1220;
-  font-weight: 700;
+  font-weight: 800;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  box-shadow: 0 12px 30px rgba(14, 165, 233, 0.35);
+  box-shadow: var(--glow);
 }
 
 .navbar__cta:hover {
   transform: translateY(-1px) scale(1.01);
-  box-shadow: 0 14px 34px rgba(14, 165, 233, 0.45);
+  box-shadow: 0 16px 38px rgba(124, 58, 237, 0.5);
 }
 
 .navbar__toggle {
