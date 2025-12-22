@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -15,13 +15,49 @@ L.Icon.Default.mergeOptions({
   shadowUrl: markerShadow,
 });
 
-const FES_COORDS = [34.0181, -5.0078];
-
 const Map = () => {
+  const [userPosition, setUserPosition] = useState(null);
+  const [geoError, setGeoError] = useState(null);
+  const [geoStatus, setGeoStatus] = useState("pending"); // pending | ok | error
+
+  // Récupère la position de l'utilisateur si autorisée
+  useEffect(() => {
+    alert("la position sur pc n'est pas très fiable !");
+
+    if (!navigator.geolocation) {
+      setGeoError("La géolocalisation n'est pas supportée par ce navigateur.");
+      setGeoStatus("error");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setUserPosition({
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+        });
+        setGeoStatus("ok");
+      },
+      (err) => {
+        setGeoError(err.message || "Impossible de récupérer la position.");
+        setGeoStatus("error");
+      }
+      ,
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 30000,
+      }
+    );
+  }, []);
+
+  // Centre par défaut global si pas de position utilisateur
+  const center = userPosition ? [userPosition.lat, userPosition.lng] : [20, 0];
+
   return (
     <div className="map-screen">
       <MapContainer
-        center={FES_COORDS}
+        center={center}
         zoom={3}
         minZoom={2}
         worldCopyJump
@@ -33,13 +69,24 @@ const Map = () => {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        <Marker position={FES_COORDS}>
-          <Popup>
-            Fès, Maroc <br />
-            Centre initial de la carte.
-          </Popup>
-        </Marker>
+        {userPosition && (
+          <Marker position={[userPosition.lat, userPosition.lng]}>
+            <Popup>Votre position actuelle</Popup>
+          </Marker>
+        )}
       </MapContainer>
+
+      {geoError && (
+        <div className="map-geo-error">
+          {geoError}
+        </div>
+      )}
+
+      {!geoError && geoStatus === "pending" && (
+        <div className="map-geo-info">
+          Autorisez la géolocalisation pour centrer la carte sur vous.
+        </div>
+      )}
     </div>
   );
 };
