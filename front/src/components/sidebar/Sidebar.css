@@ -106,18 +106,18 @@
 
 /* Open-handle when sidebar is closed */
 .sidebar-open-handle {
-  position: fixed;
-  left: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 10001;
-  background: linear-gradient(180deg,#071226 0%, #0f1724 100%);
-  color: #e6eef8;
-  border: none;
-  border-radius: 8px;
-  padding: 8px 10px;
-  cursor: pointer;
-  box-shadow: 0 6px 18px rgba(2,6,23,0.6);
+	position: fixed;
+	left: 12px;
+	top: 12px;
+	transform: none;
+	z-index: 10001;
+	background: linear-gradient(180deg,#071226 0%, #0f1724 100%);
+	color: #e6eef8;
+	border: none;
+	border-radius: 8px;
+	padding: 8px 10px;
+	cursor: pointer;
+	box-shadow: 0 6px 18px rgba(2,6,23,0.6);
 }
 
 /* When the sidebar is visible we keep the toggle inside; small visual tweaks */

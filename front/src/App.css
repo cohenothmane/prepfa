@@ -43,7 +43,7 @@
 }
 
 .main-content {
-  margin-left: 220px; /* space for sidebar */
+  margin: 0; /* remove left margin so content fills width */
   padding: 20px;
   transition: margin-left 200ms ease;
 }
