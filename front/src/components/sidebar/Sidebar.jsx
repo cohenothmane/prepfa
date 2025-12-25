@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import "./Sidebar.css";
 
-const Sidebar = ({ open = true, onToggle = () => {} }) => {
+const Sidebar = ({ open = true, onToggle = () => {}, onSearch = () => {} }) => {
+  const [query, setQuery] = useState("");
   if (!open) {
     return (
       <button
@@ -26,6 +27,25 @@ const Sidebar = ({ open = true, onToggle = () => {} }) => {
       </button>
 
       <nav className="sidebar-nav">
+        <form
+          className="sidebar-search"
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (query.trim()) onSearch(query.trim());
+          }}
+        >
+          <input
+            type="search"
+            placeholder="Rechercher un spot..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="search-input"
+            aria-label="Recherche de spots"
+          />
+          <button type="submit" className="search-button" aria-label="Lancer la recherche">
+            🔍
+          </button>
+        </form>
         <NavLink to="/home" className={({ isActive }) => (isActive ? "nav-item active" : "nav-item")}>
           <span className="icon">🏠</span>
           <span className="label">Accueil</span>
