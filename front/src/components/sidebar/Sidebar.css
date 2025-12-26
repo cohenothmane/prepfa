@@ -75,6 +75,31 @@
 	justify-content: center;
 }
 
+/* Add spot button */
+.sidebar-add-spot {
+	padding: 6px 8px;
+}
+
+.add-spot-button {
+	width: 100%;
+	padding: 10px;
+	border-radius: 8px;
+	border: none;
+	background: linear-gradient(90deg, rgba(99,102,241,0.12), rgba(99,102,241,0.06));
+	color: #e6eef8;
+	cursor: pointer;
+	text-align: left;
+	display: inline-flex;
+	gap: 8px;
+	align-items: center;
+	justify-content: flex-start;
+	font-weight: 500;
+}
+
+.add-spot-button:hover {
+	background: rgba(99,102,241,0.16);
+}
+
 .nav-item {
 	display: flex;
 	align-items: center;
