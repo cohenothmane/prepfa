@@ -1,6 +1,6 @@
 import React from "react";
 import "./Login.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -70,9 +70,9 @@ const Login = () => {
 
           <p className="login__footer">
             Nouveau sur prepfa ?{" "}
-            <a className="link" href="#signup">
+            <Link className="link" to="/inscription">
               Créer un compte
-            </a>
+            </Link>
           </p>
         </div>
       </div>
