@@ -1,5 +1,5 @@
 # 🌍 MapSpot – Réseau Social Géolocalisé
-
+note: pour toute modif/action sur la map regarder sur https://leafletjs.com/examples.html les outils à utiliser)
 MapSpot est une plateforme sociale basée sur une carte interactive permettant aux utilisateurs de **découvrir, partager et commenter des lieux intéressants** liés au sport, aux loisirs et aux activités en plein air.
 
 L’objectif est de créer une **communauté collaborative** où chacun peut signaler des spots utiles ou originaux (karting, skateboard, football, vélo, golf, etc.), en les localisant sur une carte, en ajoutant des photos et en partageant son expérience.
