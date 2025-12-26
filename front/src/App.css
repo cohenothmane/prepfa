@@ -2,3 +2,26 @@
   min-height: 100vh;
   background: #0f172a;
 }
+
+/* Layout when sidebar is present */
+.layout-with-sidebar {
+  display: block;
+}
+
+.main-content {
+  margin: 0; /* remove left margin so content fills width */
+  padding: 20px;
+  transition: margin-left 200ms ease;
+}
+
+/* When sidebar collapses, it keeps min-width 64px; adjust main accordingly via media/JS if needed */
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0;
+  }
+}
+
+/* When sidebar is hidden completely */
+.layout-with-sidebar.sidebar-hidden .main-content {
+  margin-left: 0;
+}
