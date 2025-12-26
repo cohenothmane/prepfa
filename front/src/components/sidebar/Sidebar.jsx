@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import "./Sidebar.css";
 
-const Sidebar = ({ open = true, onToggle = () => {}, onSearch = () => {} }) => {
+const Sidebar = ({ open = true, onToggle = () => {}, onSearch = () => {}, onAddSpot = () => {} }) => {
   const [query, setQuery] = useState("");
   if (!open) {
     return (
@@ -46,6 +46,18 @@ const Sidebar = ({ open = true, onToggle = () => {}, onSearch = () => {} }) => {
             🔍
           </button>
         </form>
+
+        <div className="sidebar-add-spot">
+          <button
+            type="button"
+            className="add-spot-button"
+            onClick={() => onAddSpot()}
+            aria-label="Ajouter un spot"
+          >
+            ➕ Ajouter un spot
+          </button>
+        </div>
+
         <NavLink to="/home" className={({ isActive }) => (isActive ? "nav-item active" : "nav-item")}>
           <span className="icon">🏠</span>
           <span className="label">Accueil</span>
