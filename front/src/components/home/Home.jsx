@@ -1,11 +1,12 @@
 import React from 'react'
 import './Home.css'
+import Map from '../map/Map'
 
 const Home = () => {
   return (
     <div>
 
-    <h1>Home</h1>
+    <Map />
       
     </div>
   )

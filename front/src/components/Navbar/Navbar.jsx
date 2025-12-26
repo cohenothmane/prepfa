@@ -1,20 +1,21 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Navbar.css";
 
 const NAV_LINKS = [
-  { label: "Accueil", href: "#accueil" },
-  { label: "Fonctionnalités", href: "#features" },
-  { label: "Tarifs", href: "#pricing" },
-  { label: "Contact", href: "#contact" },
+  { label: "Accueil", href: "/home" },
+  { label: "Carte", href: "/map" },
 ];
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <header className="navbar">
       <div className="navbar__container">
-        <a className="navbar__brand" href="#accueil">
+        <a className="navbar__brand" href="/home">
+          <span className="navbar__logo-dot" />
           prepfa
         </a>
 
@@ -35,7 +36,9 @@ const Navbar = () => {
               {link.label}
             </a>
           ))}
-          <button className="navbar__cta">Se connecter</button>
+          <button className="navbar__cta" onClick={() => navigate("/login")}>
+            Se connecter
+          </button>
         </nav>
       </div>
     </header>
