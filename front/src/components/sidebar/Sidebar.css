@@ -1,7 +1,7 @@
 /* Sidebar layout */
 .sidebar {
-	width: 260px;
-	min-width: 64px;
+	width: 320px;
+	min-width: 200px;
 	background: linear-gradient(180deg,#071226 0%, #0f1724 100%);
 	color: #e6eef8;
 	height: 100vh;
@@ -51,8 +51,8 @@
 	flex: 1 1 auto;
 	padding: 8px 10px;
 	border-radius: 8px;
-	border: 1px solid rgba(230,238,248,0.08);
-	background: rgba(255,255,255,0.02);
+	border: 1px solid rgba(230,238,248,0.06);
+	background: linear-gradient(180deg,#071226 0%, #0f1724 100%);
 	color: inherit;
 	outline: none;
 }
@@ -73,6 +73,80 @@
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
+}
+
+/* Filters (category + radius) */
+.sidebar-filters {
+	padding: 8px;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.filter-row {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.filter-label {
+ 	font-size: 13px;
+ 	color: rgba(230,238,248,0.8);
+ 	min-width: 56px;
+}
+
+.filter-select {
+	flex: 1 1 auto;
+	padding: 6px 8px;
+	border-radius: 8px;
+	border: 1px solid rgba(230,238,248,0.06);
+	background-color: #071226;
+	background-image: linear-gradient(180deg,#071226 0%, #0f1724 100%);
+	color: #e6eef8;
+	-webkit-text-fill-color: #e6eef8;
+	box-shadow: inset 0 0 0 1px rgba(255,255,255,0.01);
+	-webkit-appearance: none;
+	appearance: none;
+}
+
+/* Ensure dropdown options match sidebar colors (some browsers limit styling) */
+.filter-select option {
+	background-color: #071226;
+	color: #e6eef8;
+}
+
+/* Hide default IE/Edge arrow to keep styles consistent */
+.filter-select::-ms-expand {
+	display: none;
+}
+
+/* For IE/Edge selected value coloring */
+.filter-select::-ms-value {
+	color: #e6eef8;
+}
+
+/* Try to style optgroup label appearance where supported */
+.filter-select optgroup {
+	color: rgba(200,214,228,0.95);
+	background-color: #071226;
+}
+
+/* On some browsers the optgroup label can't be styled; using a subtle fallback */
+.filter-select::-webkit-calendar-picker-indicator,
+.filter-select optgroup[label] {
+	color: rgba(200,214,228,0.9);
+}
+
+.range-input {
+	flex: 1 1 auto;
+}
+
+.radius-value {
+	min-width: 0;
+	margin-left: 4px;
+	text-align: left;
+	font-size: 13px;
+	color: rgba(230,238,248,0.75);
 }
 
 /* Add spot button */
