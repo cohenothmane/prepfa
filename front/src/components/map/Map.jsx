@@ -25,7 +25,7 @@ const MapClickHandler = ({ onMapClick }) => {
   return null;
 };
 
-const Map = () => {
+const Map = React.forwardRef(({ searchQuery = "" }, ref) => {
   const [userPosition, setUserPosition] = useState(null);
   const [geoError, setGeoError] = useState(null);
   const [geoStatus, setGeoStatus] = useState("pending"); // pending | ok | error
@@ -35,6 +35,9 @@ const Map = () => {
   const [formData, setFormData] = useState({ name: '', description: '' });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [selectedSpot, setSelectedSpot] = useState(null);
+  const mapRef = useRef(null);
+  const markersRef = useRef({});
 
   // Récupère la position de l'utilisateur si autorisée
   useEffect(() => {
@@ -70,6 +73,29 @@ const Map = () => {
   useEffect(() => {
     fetchSpots();
   }, []);
+
+  // Handle search query - auto navigate to spot
+  useEffect(() => {
+    if (searchQuery && spots.length > 0) {
+      const matchedSpot = spots.find(spot => 
+        spot.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      
+      if (matchedSpot) {
+        setSelectedSpot(matchedSpot);
+        // Zoom to the spot and center map
+        if (mapRef.current) {
+          mapRef.current.setView([matchedSpot.lat, matchedSpot.lng], 14);
+          // Open the popup after a short delay
+          setTimeout(() => {
+            if (markersRef.current[matchedSpot.id]) {
+              markersRef.current[matchedSpot.id].openPopup();
+            }
+          }, 500);
+        }
+      }
+    }
+  }, [searchQuery, spots]);
 
   const fetchSpots = async () => {
     const token = localStorage.getItem('authToken');
@@ -199,6 +225,7 @@ const Map = () => {
   return (
     <div className="map-screen">
       <MapContainer
+        ref={mapRef}
         center={center}
         zoom={3}
         minZoom={2}
@@ -220,7 +247,13 @@ const Map = () => {
         )}
 
         {spots.map((spot) => (
-          <Marker key={spot.id} position={[spot.lat, spot.lng]}>
+          <Marker 
+            key={spot.id} 
+            position={[spot.lat, spot.lng]}
+            ref={(el) => {
+              if (el) markersRef.current[spot.id] = el;
+            }}
+          >
             <Popup>
               <div className="spot-popup">
                 <h3>{spot.name}</h3>
@@ -246,6 +279,19 @@ const Map = () => {
       {!geoError && geoStatus === "pending" && (
         <div className="map-geo-info">
           Autorisez la géolocalisation pour centrer la carte sur vous.
+        </div>
+      )}
+
+      {/* Search Result Feedback */}
+      {searchQuery && selectedSpot && (
+        <div className="search-result-found">
+          ✓ Spot trouvé: {selectedSpot.name}
+        </div>
+      )}
+      
+      {searchQuery && !selectedSpot && spots.length > 0 && (
+        <div className="search-result-not-found">
+          ✗ Aucun spot trouvé pour "{searchQuery}"
         </div>
       )}
 
@@ -323,6 +369,8 @@ const Map = () => {
       )}
     </div>
   );
-};
+});
+
+Map.displayName = "Map";
 
 export default Map;
