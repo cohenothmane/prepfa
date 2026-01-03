@@ -95,9 +95,14 @@ app.post('/api/auth/login', (req, res) => {
 });
 
 // Spots endpoints
+// Public endpoint - everyone can view all spots (like Google Maps)
+app.get('/api/spots/public', (req, res) => {
+    res.json({ spots: spots });
+});
+
+// Legacy endpoint for backward compatibility (also requires auth)
 app.get('/api/spots', verifyToken, (req, res) => {
-    const userSpots = spots.filter(s => s.userId === req.userId);
-    res.json({ spots: userSpots });
+    res.json({ spots: spots });
 });
 
 app.post('/api/spots', verifyToken, (req, res) => {
@@ -108,10 +113,17 @@ app.post('/api/spots', verifyToken, (req, res) => {
         return res.status(400).json({ error: 'Nom et coordonnées requis' });
     }
 
-    // Create spot
+    // Find the user to get their name
+    const user = users.find(u => u.id === req.userId);
+    if (!user) {
+        return res.status(401).json({ error: 'Utilisateur non trouvé' });
+    }
+
+    // Create spot with user information
     const spot = {
         id: Date.now(),
         userId: req.userId,
+        createdByName: user.nom, // Store the username
         name,
         description: description || '',
         lat: parseFloat(lat),
