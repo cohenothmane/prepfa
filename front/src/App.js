@@ -1,20 +1,22 @@
 import "./App.css";
 import React, { useState } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar";
 import Sidebar from "./components/sidebar/Sidebar";
 import Home from "./components/home/Home";
 import Login from "./components/login/Login";
 import Inscription from "./components/inscription/Inscription";
 import Map from "./components/map/Map";
+import SearchPage from "./components/recherche/SearchPage";
 
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const navigate = useNavigate();
 
   const handleToggle = (open) => setSidebarOpen(Boolean(open));
   const handleSearch = (query) => {
-    // Placeholder: forward search to map component or perform lookup
-    console.log("Search query:", query);
+    // Navigue vers la page de recherche avec la requête
+    navigate(`/search?q=${encodeURIComponent(query)}`);
   };
 
   return (
@@ -27,6 +29,7 @@ function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/inscription" element={<Inscription />} />
+          <Route path="/search" element={<SearchPage />} />
         </Routes>
       </main>
     </div>
