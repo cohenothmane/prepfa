@@ -6,6 +6,7 @@ const Sidebar = ({ open = true, onToggle = () => {}, onSearch = () => {}, onAddS
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("Tous");
   const [radius, setRadius] = useState(5);
+  const [radiusEnabled, setRadiusEnabled] = useState(true);
   if (!open) {
     return (
       <button
@@ -113,20 +114,38 @@ const Sidebar = ({ open = true, onToggle = () => {}, onSearch = () => {}, onAddS
 
           <label className="filter-row">
             <span className="filter-label">Rayon</span>
-            <input
-              type="range"
-              min="1"
-              max="50"
-              value={radius}
-              onChange={(e) => {
-                const r = Number(e.target.value);
-                setRadius(r);
-                onFilterChange({ category, radius: r });
-              }}
-              className="range-input"
-              aria-label="Rayon de recherche en kilomètres"
-            />
-            <span className="radius-value">{radius} km</span>
+            <div className="radius-controls">
+              <label className="radius-toggle">
+                <input
+                  type="checkbox"
+                  checked={radiusEnabled}
+                  onChange={(e) => {
+                    const enabled = Boolean(e.target.checked);
+                    setRadiusEnabled(enabled);
+                    onFilterChange({ category, radius, radiusEnabled: enabled });
+                  }}
+                  aria-label="Activer le rayon"
+                />
+                <span>{radiusEnabled ? "Activé" : "Désactivé"}</span>
+              </label>
+
+              <input
+                type="range"
+                min="1"
+                max="50"
+                value={radius}
+                onChange={(e) => {
+                  const r = Number(e.target.value);
+                  setRadius(r);
+                  onFilterChange({ category, radius: r, radiusEnabled });
+                }}
+                className="range-input"
+                aria-label="Rayon de recherche en kilomètres"
+                disabled={!radiusEnabled}
+              />
+
+              <span className="radius-value">{radius} km</span>
+            </div>
           </label>
         </div>
 

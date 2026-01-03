@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents, Circle } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "./Map.css";
@@ -25,7 +25,7 @@ const MapClickHandler = ({ onMapClick }) => {
   return null;
 };
 
-const Map = React.forwardRef(({ searchQuery = "" }, ref) => {
+const Map = React.forwardRef(({ searchQuery = "", filters = {} }, ref) => {
   const [userPosition, setUserPosition] = useState(null);
   const [geoError, setGeoError] = useState(null);
   const [geoStatus, setGeoStatus] = useState("pending"); // pending | ok | error
@@ -284,9 +284,18 @@ const Map = React.forwardRef(({ searchQuery = "" }, ref) => {
         <MapClickHandler onMapClick={handleMapClick} />
 
         {userPosition && (
-          <Marker position={[userPosition.lat, userPosition.lng]}>
-            <Popup>Votre position actuelle</Popup>
-          </Marker>
+          <>
+            <Marker position={[userPosition.lat, userPosition.lng]}>
+              <Popup>Votre position actuelle</Popup>
+            </Marker>
+            {filters && filters.radiusEnabled !== false && typeof filters.radius === 'number' && (
+              <Circle
+                center={[userPosition.lat, userPosition.lng]}
+                radius={filters.radius * 1000}
+                pathOptions={{ color: "#2b7cff", fillOpacity: 0.08 }}
+              />
+            )}
+          </>
         )}
 
         {spots.map((spot) => (
