@@ -58,60 +58,103 @@ const Map = React.forwardRef(({ searchQuery = "" }, ref) => {
         setGeoStatus("ok");
       },
       (err) => {
-        setGeoError(err.message || "Impossible de récupérer la position.");
+        console.error("Geolocation error:", err);
+        let errorMsg = "Impossible de récupérer la position.";
+        
+        if (err.code === 1) {
+          errorMsg = "Veuillez autoriser la géolocalisation pour centrer la carte sur vous.";
+        } else if (err.code === 2) {
+          errorMsg = "Position non disponible. Vérifiez votre connexion réseau.";
+        } else if (err.code === 3) {
+          errorMsg = "Délai d'attente dépassé. Veuillez réessayer.";
+        }
+        
+        setGeoError(errorMsg);
         setGeoStatus("error");
       },
       {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 30000,
+        enableHighAccuracy: false,
+        timeout: 15000,
+        maximumAge: 300000,
       }
     );
   }, []);
 
-  // Load spots from backend on mount
+  // Load spots from backend on mount (public data, no auth needed)
   useEffect(() => {
     fetchSpots();
+  }, []);
+
+  // Refetch spots when user changes (detected by different auth token)
+  useEffect(() => {
+    const checkUserAndRefetch = () => {
+      const currentToken = localStorage.getItem('authToken');
+      const currentUser = localStorage.getItem('user');
+      
+      // Store current user to detect changes
+      const storedLastUser = sessionStorage.getItem('lastAuthUser');
+      
+      if (currentUser && currentUser !== storedLastUser) {
+        sessionStorage.setItem('lastAuthUser', currentUser);
+        if (currentToken) {
+          fetchSpots(); // Refetch when user changes
+        }
+      }
+    };
+
+    // Check on component mount
+    checkUserAndRefetch();
+
+    // Also refetch periodically (every 2 seconds) to catch account switches
+    const interval = setInterval(checkUserAndRefetch, 2000);
+    
+    return () => clearInterval(interval);
   }, []);
 
   // Handle search query - auto navigate to spot
   useEffect(() => {
     if (searchQuery && spots.length > 0) {
-      const matchedSpot = spots.find(spot => 
-        spot.name.toLowerCase().includes(searchQuery.toLowerCase())
+      const query = searchQuery.toLowerCase();
+      
+      // Filter spots that match the search query (in name or description)
+      const matchedSpots = spots.filter(spot => 
+        spot.name.toLowerCase().includes(query) || 
+        (spot.description && spot.description.toLowerCase().includes(query))
       );
       
-      if (matchedSpot) {
-        setSelectedSpot(matchedSpot);
+      if (matchedSpots.length > 0) {
+        let selectedSpotToShow = matchedSpots[0];
+        
+        // If user position available, find the closest spot to user
+        if (userPosition && matchedSpots.length > 1) {
+          selectedSpotToShow = matchedSpots.reduce((closest, spot) => {
+            const distToClosest = Math.pow(closest.lat - userPosition.lat, 2) + 
+                                 Math.pow(closest.lng - userPosition.lng, 2);
+            const distToSpot = Math.pow(spot.lat - userPosition.lat, 2) + 
+                              Math.pow(spot.lng - userPosition.lng, 2);
+            return distToSpot < distToClosest ? spot : closest;
+          });
+        }
+        
+        setSelectedSpot(selectedSpotToShow);
         // Zoom to the spot and center map
         if (mapRef.current) {
-          mapRef.current.setView([matchedSpot.lat, matchedSpot.lng], 14);
+          mapRef.current.setView([selectedSpotToShow.lat, selectedSpotToShow.lng], 14);
           // Open the popup after a short delay
           setTimeout(() => {
-            if (markersRef.current[matchedSpot.id]) {
-              markersRef.current[matchedSpot.id].openPopup();
+            if (markersRef.current[selectedSpotToShow.id]) {
+              markersRef.current[selectedSpotToShow.id].openPopup();
             }
           }, 500);
         }
       }
     }
-  }, [searchQuery, spots]);
+  }, [searchQuery, spots, userPosition]);
 
   const fetchSpots = async () => {
-    const token = localStorage.getItem('authToken');
-    
-    // Don't fetch if no token
-    if (!token) {
-      console.log('No auth token found');
-      return;
-    }
-
     try {
-      const response = await fetch('http://localhost:4000/api/spots', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      // Use public endpoint - no auth needed, see all spots from all users
+      const response = await fetch('http://localhost:4000/api/spots/public');
       if (response.ok) {
         const data = await response.json();
         setSpots(data.spots || []);
@@ -257,6 +300,7 @@ const Map = React.forwardRef(({ searchQuery = "" }, ref) => {
             <Popup>
               <div className="spot-popup">
                 <h3>{spot.name}</h3>
+                {spot.createdByName && <p className="spot-creator">👤 {spot.createdByName}</p>}
                 {spot.description && <p>{spot.description}</p>}
                 <button 
                   onClick={() => handleDeleteSpot(spot.id)}
@@ -269,6 +313,24 @@ const Map = React.forwardRef(({ searchQuery = "" }, ref) => {
           </Marker>
         ))}
       </MapContainer>
+
+      {/* Zoom Controls */}
+      <div className="zoom-controls">
+        <button 
+          className="zoom-btn zoom-in" 
+          onClick={() => mapRef.current?.zoomIn()}
+          title="Zoom in"
+        >
+          +
+        </button>
+        <button 
+          className="zoom-btn zoom-out" 
+          onClick={() => mapRef.current?.zoomOut()}
+          title="Zoom out"
+        >
+          −
+        </button>
+      </div>
 
       {geoError && (
         <div className="map-geo-error">

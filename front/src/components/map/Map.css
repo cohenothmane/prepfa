@@ -369,3 +369,57 @@ body {
   }
 }
 
+/* Spot creator name styling */
+.spot-creator {
+  margin-top: 8px !important;
+  padding-top: 8px;
+  border-top: 1px solid #ddd;
+  font-size: 0.8rem !important;
+  color: #4CAF50;
+  font-weight: 600;
+}
+
+/* Zoom Controls */
+.zoom-controls {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 1000;
+}
+
+.zoom-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: none;
+  background: rgba(5, 8, 22, 0.9);
+  color: #e8edf7;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.2s ease;
+}
+
+.zoom-btn:hover {
+  background: rgba(5, 8, 22, 1);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  transform: scale(1.05);
+}
+
+.zoom-btn:active {
+  transform: scale(0.95);
+}
+
+.zoom-in {
+}
+
+.zoom-out {
+}
