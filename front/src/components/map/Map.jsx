@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useRef, useImperativeHandle } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents, Circle } from "react-leaflet";
+import React, { useEffect, useState, useRef } from "react";
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "./Map.css";
@@ -16,16 +16,16 @@ L.Icon.Default.mergeOptions({
 });
 
 // Map click handler component
-const MapClickHandler = ({ onMapClick, isMarkingMode }) => {
+const MapClickHandler = ({ onMapClick }) => {
   useMapEvents({
     click: (e) => {
-      if (isMarkingMode) onMapClick(e.latlng);
+      onMapClick(e.latlng);
     },
   });
   return null;
 };
 
-const Map = React.forwardRef(({ searchQuery = "", filters = {} }, ref) => {
+const Map = React.forwardRef(({ searchQuery = "" }, ref) => {
   const [userPosition, setUserPosition] = useState(null);
   const [geoError, setGeoError] = useState(null);
   const [geoStatus, setGeoStatus] = useState("pending"); // pending | ok | error
@@ -38,16 +38,11 @@ const Map = React.forwardRef(({ searchQuery = "", filters = {} }, ref) => {
   const [selectedSpot, setSelectedSpot] = useState(null);
   const mapRef = useRef(null);
   const markersRef = useRef({});
-  const [isMarkingMode, setIsMarkingMode] = useState(false);
-
-  // Expose methods to parent via ref
-  useImperativeHandle(ref, () => ({
-    enableMarkingMode: () => setIsMarkingMode(true),
-    disableMarkingMode: () => setIsMarkingMode(false),
-  }));
 
   // Récupère la position de l'utilisateur si autorisée
   useEffect(() => {
+    alert("la position sur pc n'est pas très fiable !");
+
     if (!navigator.geolocation) {
       setGeoError("La géolocalisation n'est pas supportée par ce navigateur.");
       setGeoStatus("error");
@@ -224,7 +219,6 @@ const Map = React.forwardRef(({ searchQuery = "", filters = {} }, ref) => {
         setSelectedLocation(null);
         setShowForm(false);
         setError(null);
-        setIsMarkingMode(false);
       } else {
         setError(data.error || 'Erreur lors de l\'ajout du spot');
       }
@@ -241,7 +235,6 @@ const Map = React.forwardRef(({ searchQuery = "", filters = {} }, ref) => {
     setSelectedLocation(null);
     setFormData({ name: '', description: '' });
     setError(null);
-    setIsMarkingMode(false);
   };
 
   const handleDeleteSpot = async (spotId) => {
@@ -288,21 +281,12 @@ const Map = React.forwardRef(({ searchQuery = "", filters = {} }, ref) => {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        <MapClickHandler onMapClick={handleMapClick} isMarkingMode={isMarkingMode} />
+        <MapClickHandler onMapClick={handleMapClick} />
 
         {userPosition && (
-          <>
-            <Marker position={[userPosition.lat, userPosition.lng]}>
-              <Popup>Votre position actuelle</Popup>
-            </Marker>
-            {filters && filters.radiusEnabled !== false && typeof filters.radius === 'number' && (
-              <Circle
-                center={[userPosition.lat, userPosition.lng]}
-                radius={filters.radius * 1000}
-                pathOptions={{ color: "#2b7cff", fillOpacity: 0.08 }}
-              />
-            )}
-          </>
+          <Marker position={[userPosition.lat, userPosition.lng]}>
+            <Popup>Votre position actuelle</Popup>
+          </Marker>
         )}
 
         {spots.map((spot) => (
@@ -439,11 +423,10 @@ const Map = React.forwardRef(({ searchQuery = "", filters = {} }, ref) => {
         </div>
       )}
 
-      {/* Instructions --- visible only when marking mode is active */}
-      {!showForm && isMarkingMode && (
+      {/* Instructions */}
+      {!showForm && (
         <div className="map-instructions">
           💡 Cliquez sur la carte pour ajouter un spot
-          <button className="cancel-marking" onClick={() => setIsMarkingMode(false)} aria-label="Annuler">Annuler</button>
         </div>
       )}
     </div>
