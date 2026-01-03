@@ -2,12 +2,10 @@ import React from 'react'
 import './Home.css'
 import Map from '../map/Map'
 
-const Home = () => {
+const Home = ({ filters = {} }) => {
   return (
     <div>
-
-    <Map />
-      
+      <Map filters={filters} />
     </div>
   )
 }

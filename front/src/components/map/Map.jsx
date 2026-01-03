@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, Circle } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "./Map.css";
@@ -15,7 +15,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: markerShadow,
 });
 
-const Map = () => {
+const Map = ({ filters = {} }) => {
   const [userPosition, setUserPosition] = useState(null);
   const [geoError, setGeoError] = useState(null);
   const [geoStatus, setGeoStatus] = useState("pending"); // pending | ok | error
@@ -70,9 +70,18 @@ const Map = () => {
         />
 
         {userPosition && (
-          <Marker position={[userPosition.lat, userPosition.lng]}>
-            <Popup>Votre position actuelle</Popup>
-          </Marker>
+          <>
+            <Marker position={[userPosition.lat, userPosition.lng]}>
+              <Popup>Votre position actuelle</Popup>
+            </Marker>
+            {filters && typeof filters.radius === 'number' && (
+              <Circle
+                center={[userPosition.lat, userPosition.lng]}
+                radius={filters.radius * 1000}
+                pathOptions={{ color: "#2b7cff", fillOpacity: 0.08 }}
+              />
+            )}
+          </>
         )}
       </MapContainer>
 
