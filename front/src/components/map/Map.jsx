@@ -15,6 +15,9 @@ L.Icon.Default.mergeOptions({
   shadowUrl: markerShadow,
 });
 
+// Catégories à exclure de l'affichage sur la map
+const EXCLUDED_CATEGORIES = ['bar', 'glacier', 'pâtisserie'];
+
 // Données UNIQUES - source de vérité - Maroc
 export const allSpots = [
   { id: 1, category: 'café', location: 'Fès', lat: 34.0626, lng: -5.0063 },
@@ -67,24 +70,18 @@ export const allSpots = [
   { id: 48, category: 'glacier', location: 'Casablanca', lat: 33.5820, lng: -7.6180 },
 ];
 
-// Créer des icônes colorées avec la catégorie (pas le nom)
+// Créer des icônes colorées avec la catégorie (les catégories exclues ne sont pas affichées)
 const createCategoryIcon = (category) => {
   const colors = {
     café: '#8B4513',
-    pâtisserie: '#FFB6C1',
     restaurant: '#FF6347',
-    bar: '#9370DB',
     pizzeria: '#FFD700',
-    glacier: '#87CEEB',
   };
 
   const iconEmojis = {
     café: '☕',
-    pâtisserie: '🧁',
     restaurant: '🍽️',
-    bar: '🍸',
     pizzeria: '🍕',
-    glacier: '🍦',
   };
 
   const color = colors[category] || '#666';
@@ -175,8 +172,8 @@ const Map = ({ filteredSpots = [] }) => {
   const [zoom, setZoom] = useState(6);
   const mapRef = useRef(null);
 
-  // Afficher TOUS les spots par défaut OU les spots filtrés
-  const spotsToDisplay = filteredSpots.length > 0 ? filteredSpots : allSpots;
+  // Ne pas afficher de points sur la map (suppression de tous les marqueurs)
+  const spotsToDisplay = [];
   useEffect(() => {
     if (!navigator.geolocation) {
       setGeoError("La géolocalisation n'est pas supportée par ce navigateur.");
@@ -246,11 +243,8 @@ const Map = ({ filteredSpots = [] }) => {
       <div className="map-legend">
         <div className="legend-title">Catégories</div>
         <div className="legend-item"><span>☕</span> Café</div>
-        <div className="legend-item"><span>🧁</span> Pâtisserie</div>
         <div className="legend-item"><span>🍽️</span> Restaurant</div>
-        <div className="legend-item"><span>🍸</span> Bar</div>
         <div className="legend-item"><span>🍕</span> Pizzeria</div>
-        <div className="legend-item"><span>🍦</span> Glacier</div>
       </div>
     </div>
   );
