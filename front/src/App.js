@@ -14,6 +14,15 @@ function App() {
   const mapRef = useRef(null);
   const navigate = useNavigate();
 
+  const handleAddSpotClick = () => {
+    navigate('/map');
+    setTimeout(() => {
+      if (mapRef.current && typeof mapRef.current.enableMarkingMode === 'function') {
+        mapRef.current.enableMarkingMode();
+      }
+    }, 250);
+  };
+
   const handleToggle = (open) => setSidebarOpen(Boolean(open));
   
   const handleSearch = (query) => {
@@ -25,7 +34,7 @@ function App() {
 
   return (
     <div className={`app layout-with-sidebar ${!sidebarOpen ? "sidebar-hidden" : ""}`}>
-      <Sidebar open={sidebarOpen} onToggle={handleToggle} onSearch={handleSearch} />
+      <Sidebar open={sidebarOpen} onToggle={handleToggle} onSearch={handleSearch} onAddSpot={handleAddSpotClick} />
       <Navbar />
       <main className="app-content">
         <Routes>
