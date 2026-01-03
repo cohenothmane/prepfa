@@ -172,10 +172,8 @@ const Map = ({ filteredSpots = [] }) => {
   const [zoom, setZoom] = useState(6);
   const mapRef = useRef(null);
 
-  // Afficher TOUS les spots par défaut OU les spots filtrés
-  // Exclure les catégories non souhaitées (bar, glacier, pâtisserie)
-  const rawSpots = filteredSpots.length > 0 ? filteredSpots : allSpots;
-  const spotsToDisplay = rawSpots.filter((s) => !EXCLUDED_CATEGORIES.includes(s.category));
+  // Ne pas afficher de points sur la map (suppression de tous les marqueurs)
+  const spotsToDisplay = [];
   useEffect(() => {
     if (!navigator.geolocation) {
       setGeoError("La géolocalisation n'est pas supportée par ce navigateur.");
