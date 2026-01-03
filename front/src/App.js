@@ -10,7 +10,7 @@ import Map from "./components/map/Map";
 
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [filters, setFilters] = useState({ category: "Tous", radius: 5 });
+  const [filters, setFilters] = useState({ category: "Tous", radius: 5, radiusEnabled: true });
 
   const handleToggle = (open) => setSidebarOpen(Boolean(open));
   const handleSearch = (query) => {

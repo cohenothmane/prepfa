@@ -74,7 +74,7 @@ const Map = ({ filters = {} }) => {
             <Marker position={[userPosition.lat, userPosition.lng]}>
               <Popup>Votre position actuelle</Popup>
             </Marker>
-            {filters && typeof filters.radius === 'number' && (
+            {filters && filters.radiusEnabled !== false && typeof filters.radius === 'number' && (
               <Circle
                 center={[userPosition.lat, userPosition.lng]}
                 radius={filters.radius * 1000}
