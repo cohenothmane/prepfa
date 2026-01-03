@@ -58,7 +58,6 @@ const Inscription = () => {
 
     setIsLoading(true)
     try {
-      // Replace with your actual API endpoint
       const response = await fetch('http://localhost:4000/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -69,19 +68,21 @@ const Inscription = () => {
         })
       })
       
-      const data = await response.json();
-
+      const data = await response.json()
+      
       if (response.ok) {
+        // Stocker le token et rediriger
+        localStorage.setItem('token', data.token)
+        localStorage.setItem('user', JSON.stringify(data.user))
         setSuccess(true)
         setFormData({ nom: '', email: '', password: '', confirmPassword: '' })
         setErrors({})
-        setTimeout(() => navigate('/login'), 2000)
+        setTimeout(() => navigate('/home'), 1000)
       } else {
-        setErrors({ submit: data.error || 'Une erreur est survenue. Veuillez réessayer.' })
+        setErrors({ submit: data.message || 'Erreur lors de l\'inscription' })
       }
     } catch (error) {
-      setErrors({ submit: 'Erreur de connexion. Vérifiez que le serveur est actif.' })
-      console.error('Registration error:', error)
+      setErrors({ submit: 'Impossible de se connecter au serveur. Vérifiez qu\'il est actif.' })
     } finally {
       setIsLoading(false)
     }

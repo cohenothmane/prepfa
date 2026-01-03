@@ -4,82 +4,40 @@ import { useNavigate, Link } from "react-router-dom";
 
 const Login = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    rememberMe: false
-  });
-  const [errors, setErrors] = useState({});
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
-  };
-
-  const validateForm = () => {
-    const newErrors = {};
-    
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email requis';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Email invalide';
-    }
-    
-    if (!formData.password) {
-      newErrors.password = 'Mot de passe requis';
-    }
-    
-    return newErrors;
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    setError('');
   };
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    
-    const newErrors = validateForm();
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
-
     setIsLoading(true);
+    setError('');
+
     try {
       const response = await fetch('http://localhost:4000/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password
-        })
+        body: JSON.stringify(formData)
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        // Save token and user info
-        localStorage.setItem('authToken', data.token);
+        // Stocker le token
+        localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
-        
-        if (formData.rememberMe) {
-          localStorage.setItem('rememberEmail', formData.email);
-        }
-
         navigate('/home');
       } else {
-        setErrors({ submit: data.error || 'Erreur de connexion' });
+        setError(data.message || 'Erreur de connexion');
       }
-    } catch (error) {
-      setErrors({ submit: 'Erreur de connexion. Vérifiez que le serveur est actif.' });
-      console.error('Login error:', error);
+    } catch (err) {
+      setError('Impossible de se connecter. Vérifiez que le serveur est actif.');
     } finally {
       setIsLoading(false);
     }
@@ -108,13 +66,8 @@ const Login = () => {
             <p className="muted">Heureux de vous revoir.</p>
           </div>
 
-          {errors.submit && (
-            <div className="error-message" style={{ color: '#d32f2f', marginBottom: '16px', padding: '8px 12px', backgroundColor: '#ffebee', borderRadius: '4px' }}>
-              {errors.submit}
-            </div>
-          )}
-
-          <form className="login__form" onSubmit={handleLogin}>
+          <form className="login__form">
+            {error && <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
             <label>
               Email
               <input 
@@ -122,10 +75,8 @@ const Login = () => {
                 name="email" 
                 value={formData.email}
                 onChange={handleChange}
-                placeholder="vous@example.com"
-                disabled={isLoading}
+                placeholder="vous@example.com" 
               />
-              {errors.email && <span style={{ color: '#d32f2f', fontSize: '12px' }}>{errors.email}</span>}
             </label>
 
             <label>
@@ -135,32 +86,20 @@ const Login = () => {
                 name="password" 
                 value={formData.password}
                 onChange={handleChange}
-                placeholder="••••••••"
-                disabled={isLoading}
+                placeholder="••••••••" 
               />
-              {errors.password && <span style={{ color: '#d32f2f', fontSize: '12px' }}>{errors.password}</span>}
             </label>
 
             <div className="login__row">
               <label className="checkbox">
-                <input 
-                  type="checkbox" 
-                  name="rememberMe"
-                  checked={formData.rememberMe}
-                  onChange={handleChange}
-                /> 
-                <span>Se souvenir de moi</span>
+                <input type="checkbox" /> <span>Se souvenir de moi</span>
               </label>
               <a className="link" href="#forgot">
                 Mot de passe oublié ?
               </a>
             </div>
 
-            <button 
-              type="submit" 
-              className="btn-primary"
-              disabled={isLoading}
-            >
+            <button type="submit" onClick={handleLogin} disabled={isLoading} className="btn-primary">
               {isLoading ? 'Connexion en cours...' : 'Se connecter'}
             </button>
 
@@ -169,8 +108,8 @@ const Login = () => {
             </div>
 
             <div className="login__social">
-              <button type="button" disabled={isLoading}>Google</button>
-              <button type="button" disabled={isLoading}>Microsoft</button>
+              <button type="button">Google</button>
+              <button type="button">Microsoft</button>
             </div>
           </form>
 
