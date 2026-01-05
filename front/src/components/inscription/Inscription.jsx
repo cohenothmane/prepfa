@@ -80,7 +80,17 @@ const Inscription = () => {
       const data = await response.json();
 
       if (response.ok) {
-        navigate("/login");
+        // Save token and user info from registration response
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+          // Notifier les autres composants du changement d'auth
+          window.dispatchEvent(new Event('authChange'));
+        }
+        
+        setFormData({ nom: '', email: '', password: '', confirmPassword: '' });
+        setErrors({});
+        navigate('/home');
       } else {
         setErrors({ submit: data.error || "Erreur d'inscription" });
       }

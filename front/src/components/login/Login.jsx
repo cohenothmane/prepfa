@@ -68,14 +68,17 @@ const Login = () => {
       const data = await response.json();
 
       if (response.ok) {
-        localStorage.setItem("authToken", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
-
+        // Stocker le token
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        
         if (formData.rememberMe) {
           localStorage.setItem("rememberEmail", formData.email);
         }
-
-        navigate("/home");
+        
+        // Notifier les autres composants du changement d'auth
+        window.dispatchEvent(new Event('authChange'));
+        navigate('/home');
       } else {
         setErrors({ submit: data.error || "Erreur de connexion" });
       }
