@@ -13,6 +13,8 @@ import AddSpotModal from "./components/AddSpotModal/AddSpotModal";
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showAddSpotModal, setShowAddSpotModal] = useState(false);
+  const [isMarkingMode, setIsMarkingMode] = useState(false);
+  const [selectedCoords, setSelectedCoords] = useState(null);
   const navigate = useNavigate();
 
   const handleToggle = (open) => setSidebarOpen(Boolean(open));
@@ -26,9 +28,38 @@ function App() {
     if (!token) {
       navigate('/login');
     } else {
-      setShowAddSpotModal(true);
+      // D'abord naviguer vers /search pour voir la map
+      navigate('/search');
+      // Puis activer le mode marquage
+      setTimeout(() => {
+        setIsMarkingMode(true);
+      }, 100);
     }
   };
+
+  const handleSpotCreated = (spot) => {
+    // Récupérer tous les spots de la map après en avoir créé un
+    setIsMarkingMode(false);
+    // On peut ici émettre un événement pour recharger les spots
+    window.dispatchEvent(new CustomEvent('spotCreated', {
+      detail: { spot }
+    }));
+  };
+
+  // Écouter quand l'utilisateur clique sur la map en mode marquage
+  React.useEffect(() => {
+    const handleMapClick = (e) => {
+      if (!isMarkingMode) return;
+      
+      const { lat, lng } = e.detail;
+      setSelectedCoords({ lat, lng });
+      setShowAddSpotModal(true);
+      setIsMarkingMode(false); // Éteindre le mode marquage
+    };
+
+    window.addEventListener('mapPointSelected', handleMapClick);
+    return () => window.removeEventListener('mapPointSelected', handleMapClick);
+  }, [isMarkingMode]);
 
   return (
     <div className={`app layout-with-sidebar ${!sidebarOpen ? "sidebar-hidden" : ""}`}>
@@ -40,11 +71,24 @@ function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/inscription" element={<Inscription />} />
-          <Route path="/search" element={<SearchPage />} />
+          <Route 
+            path="/search" 
+            element={<SearchPage isMarkingMode={isMarkingMode} />} 
+          />
         </Routes>
       </main>
       
-      <AddSpotModal isOpen={showAddSpotModal} onClose={() => setShowAddSpotModal(false)} />
+      <AddSpotModal 
+        isOpen={showAddSpotModal} 
+        onClose={() => {
+          setShowAddSpotModal(false);
+          setSelectedCoords(null);
+          setIsMarkingMode(false);
+        }}
+        initialLat={selectedCoords?.lat}
+        initialLng={selectedCoords?.lng}
+        onSpotCreated={handleSpotCreated}
+      />
     </div>
   );
 }

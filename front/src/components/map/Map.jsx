@@ -118,7 +118,7 @@ const createCategoryIcon = (category) => {
 };
 
 // Composant pour gérer le zoom et afficher/cacher les marqueurs
-const MapContent = ({ filteredSpots = [], spotsToDisplay, onMapReady }) => {
+const MapContent = ({ filteredSpots = [], spotsToDisplay, onMapReady, isMarkingMode }) => {
   const map = useMap();
   const [currentZoom, setCurrentZoom] = useState(6);
 
@@ -130,6 +130,24 @@ const MapContent = ({ filteredSpots = [], spotsToDisplay, onMapReady }) => {
     map.on('zoomend', handleZoomChange);
     return () => map.off('zoomend', handleZoomChange);
   }, [map]);
+
+  // Handle map clicks in marking mode
+  useEffect(() => {
+    if (!isMarkingMode) return;
+
+    const handleMapClick = (e) => {
+      const { lat, lng } = e.latlng;
+      // Emit custom event with coordinates
+      window.dispatchEvent(
+        new CustomEvent('mapPointSelected', {
+          detail: { lat, lng }
+        })
+      );
+    };
+
+    map.on('click', handleMapClick);
+    return () => map.off('click', handleMapClick);
+  }, [map, isMarkingMode]);
 
   // Afficher les marqueurs SEULEMENT si zoom >= 10
   // Toujours afficher les marqueurs
@@ -165,15 +183,15 @@ const MapContent = ({ filteredSpots = [], spotsToDisplay, onMapReady }) => {
   );
 };
 
-const Map = ({ filteredSpots = [] }) => {
+const Map = ({ filteredSpots = [], isMarkingMode = false, allSpots = [] }) => {
   const [userPosition, setUserPosition] = useState(null);
   const [geoError, setGeoError] = useState(null);
   const [center, setCenter] = useState([31.7917, -7.0926]);
   const [zoom, setZoom] = useState(6);
   const mapRef = useRef(null);
 
-  // Ne pas afficher de points sur la map (suppression de tous les marqueurs)
-  const spotsToDisplay = [];
+  // Afficher les spots depuis l'API si disponibles, sinon rien
+  const spotsToDisplay = allSpots.length > 0 ? allSpots : [];
   useEffect(() => {
     if (!navigator.geolocation) {
       setGeoError("La géolocalisation n'est pas supportée par ce navigateur.");
@@ -230,6 +248,7 @@ const Map = ({ filteredSpots = [] }) => {
         <MapContent 
           filteredSpots={filteredSpots}
           spotsToDisplay={spotsToDisplay}
+          isMarkingMode={isMarkingMode}
         />
       </MapContainer>
 
