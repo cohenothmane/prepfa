@@ -249,7 +249,7 @@ const Map = React.forwardRef(({
       return;
     }
 
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem("token");
     if (!token) {
       setError("Vous devez être connecté pour ajouter un spot");
       return;
@@ -304,7 +304,7 @@ const Map = React.forwardRef(({
   const handleDeleteSpot = async (spotId) => {
     if (!window.confirm("Êtes-vous sûr de vouloir supprimer ce spot ?")) return;
 
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem("token");
     if (!token) {
       alert("Vous devez être connecté");
       return;
