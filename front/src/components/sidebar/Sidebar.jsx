@@ -141,7 +141,7 @@ const Sidebar = ({ open = true, onToggle = () => {}, onSearch = () => {}, onAddS
       </nav>
 
       <div className="sidebar-footer">
-        <small>© PrepFA</small>
+        <small>© MapSpot</small>
       </div>
     </aside>
   );
