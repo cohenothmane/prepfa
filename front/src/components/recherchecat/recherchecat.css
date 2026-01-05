@@ -1,0 +1,11 @@
+/* 
+ * recherchecat.css
+ * 
+ * Ce fichier CSS est prévu pour les styles du composant recherchecat.
+ * Actuellement, recherchecat.jsx contient uniquement des fonctions utilitaires
+ * (mapSearchToCategory, matchesCategory) qui ne nécessitent pas de styles.
+ * 
+ * Si vous transformez recherchecat.jsx en composant React avec du rendu,
+ * vous pouvez ajouter les styles ici.
+ */
+

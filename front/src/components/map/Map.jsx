@@ -4,6 +4,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "./Map.css";
 import { CATEGORIES } from "../../constants/categories";
+import { matchesCategory } from "../recherchecat/recherchecat";
 
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
@@ -121,10 +122,11 @@ const Map = React.forwardRef(({ searchQuery = "", filters = {} }, ref) => {
     if (searchQuery && spots.length > 0) {
       const query = searchQuery.toLowerCase();
       
-      // Filter spots that match the search query (in name or description)
+      // Filter spots that match the search query (in name, description, or category)
       const matchedSpots = spots.filter(spot => 
         spot.name.toLowerCase().includes(query) || 
-        (spot.description && spot.description.toLowerCase().includes(query))
+        (spot.description && spot.description.toLowerCase().includes(query)) ||
+        (spot.category && matchesCategory(query, spot.category))
       );
       
       if (matchedSpots.length > 0) {
