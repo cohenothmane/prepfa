@@ -1,5 +1,5 @@
 import "./App.css";
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar";
 import Sidebar from "./components/sidebar/Sidebar";
@@ -15,21 +15,26 @@ function App() {
   const [showAddSpotModal, setShowAddSpotModal] = useState(false);
   const [isMarkingMode, setIsMarkingMode] = useState(false);
   const [selectedCoords, setSelectedCoords] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filters, setFilters] = useState({ category: "Tous", radius: 5, radiusEnabled: true });
+  const mapRef = useRef(null);
   const navigate = useNavigate();
 
   const handleToggle = (open) => setSidebarOpen(Boolean(open));
+
   const handleSearch = (query) => {
-    // Navigue vers la page de recherche avec la requête
-    navigate(`/search?q=${encodeURIComponent(query)}`);
+    setSearchQuery(query);
+    // Prefer showing results on the map
+    navigate("/map");
   };
 
   const handleAddSpot = () => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (!token) {
-      navigate('/login');
+      navigate("/login");
     } else {
       // D'abord naviguer vers /search pour voir la map
-      navigate('/search');
+      navigate("/search");
       // Puis activer le mode marquage
       setTimeout(() => {
         setIsMarkingMode(true);
@@ -41,29 +46,51 @@ function App() {
     // Récupérer tous les spots de la map après en avoir créé un
     setIsMarkingMode(false);
     // On peut ici émettre un événement pour recharger les spots
-    window.dispatchEvent(new CustomEvent('spotCreated', {
-      detail: { spot }
-    }));
+    window.dispatchEvent(
+      new CustomEvent("spotCreated", {
+        detail: { spot },
+      })
+    );
   };
 
   // Écouter quand l'utilisateur clique sur la map en mode marquage
-  React.useEffect(() => {
+  useEffect(() => {
     const handleMapClick = (e) => {
       if (!isMarkingMode) return;
-      
+
       const { lat, lng } = e.detail;
       setSelectedCoords({ lat, lng });
       setShowAddSpotModal(true);
       setIsMarkingMode(false); // Éteindre le mode marquage
     };
 
-    window.addEventListener('mapPointSelected', handleMapClick);
-    return () => window.removeEventListener('mapPointSelected', handleMapClick);
+    window.addEventListener("mapPointSelected", handleMapClick);
+    return () => window.removeEventListener("mapPointSelected", handleMapClick);
   }, [isMarkingMode]);
+
+  const handleAddSpotClick = () => {
+    navigate("/map");
+    setTimeout(() => {
+      if (mapRef.current && typeof mapRef.current.enableMarkingMode === "function") {
+        mapRef.current.enableMarkingMode();
+      }
+    }, 250);
+  };
+
+  const handleFilterChange = (newFilters) => {
+    setFilters((prev) => ({ ...prev, ...newFilters }));
+    navigate("/map");
+  };
 
   return (
     <div className={`app layout-with-sidebar ${!sidebarOpen ? "sidebar-hidden" : ""}`}>
-      <Sidebar open={sidebarOpen} onToggle={handleToggle} onSearch={handleSearch} onAddSpot={handleAddSpot} />
+      <Sidebar
+        open={sidebarOpen}
+        onToggle={handleToggle}
+        onSearch={handleSearch}
+        onAddSpot={handleAddSpotClick}
+        onFilterChange={handleFilterChange}
+      />
       <Navbar />
       <main className="app-content">
         <Routes>
@@ -71,15 +98,16 @@ function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/inscription" element={<Inscription />} />
-          <Route 
-            path="/search" 
-            element={<SearchPage isMarkingMode={isMarkingMode} />} 
-          />
+
+          {/* ✅ garder UNE seule route /search */}
+          <Route path="/search" element={<SearchPage isMarkingMode={isMarkingMode} />} />
+
+          <Route path="/map" element={<Map ref={mapRef} searchQuery={searchQuery} filters={filters} />} />
         </Routes>
       </main>
-      
-      <AddSpotModal 
-        isOpen={showAddSpotModal} 
+
+      <AddSpotModal
+        isOpen={showAddSpotModal}
         onClose={() => {
           setShowAddSpotModal(false);
           setSelectedCoords(null);
