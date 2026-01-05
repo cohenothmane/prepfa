@@ -74,8 +74,10 @@ const Inscription = () => {
       if (response.ok) {
         // Save token and user info from registration response
         if (data.token) {
-          localStorage.setItem('authToken', data.token);
+          localStorage.setItem('token', data.token);
           localStorage.setItem('user', JSON.stringify(data.user));
+          // Notifier les autres composants du changement d'auth
+          window.dispatchEvent(new Event('authChange'));
         }
         
         setSuccess(true)

@@ -33,6 +33,11 @@ const spotSchema = new mongoose.Schema({
     max: 5,
     default: 0,
   },
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: [true, "L'utilisateur créateur est requis"],
+  },
   reviews: [
     {
       userId: {

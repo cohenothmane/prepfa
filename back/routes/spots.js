@@ -3,10 +3,30 @@ const router = express.Router();
 const Spot = require("../models/Spot");
 const { authMiddleware } = require("../middleware/auth");
 
-// ✅ GET tous les spots
+// ✅ GET tous les spots (filtrés par utilisateur si authentifié)
 router.get("/", async (req, res) => {
   try {
-    const spots = await Spot.find().populate("reviews.userId", "nom email");
+    // Si un token est fourni, ne montrer que les spots de cet utilisateur
+    const authHeader = req.headers.authorization;
+    let userId = null;
+    
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      const token = authHeader.substring(7);
+      try {
+        const jwt = require("jsonwebtoken");
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || "secret_key_prepfa");
+        userId = decoded.userId;
+      } catch (err) {
+        // Token invalide, ignorer
+      }
+    }
+
+    // Supprimer les anciens spots sans createdBy (migration)
+    await Spot.deleteMany({ createdBy: { $exists: false } });
+    
+    const filter = userId ? { createdBy: userId } : {};
+    const spots = await Spot.find(filter).populate("reviews.userId", "nom email");
+    
     res.status(200).json({
       success: true,
       count: spots.length,
@@ -80,6 +100,7 @@ router.post("/", authMiddleware, async (req, res) => {
       lat,
       lng,
       rating: rating || 0,
+      createdBy: req.userId, // Ajouter l'ID de l'utilisateur connecté
     });
 
     await spot.save();

@@ -32,6 +32,8 @@ const Login = () => {
         // Stocker le token
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
+        // Notifier les autres composants du changement d'auth
+        window.dispatchEvent(new Event('authChange'));
         navigate('/home');
       } else {
         setError(data.message || 'Erreur de connexion');
