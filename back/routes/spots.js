@@ -20,6 +20,34 @@ router.get("/", async (req, res) => {
   }
 });
 
+// ✅ GET tous les spots publics (sans authentification, format pour le frontend)
+router.get("/public", async (req, res) => {
+  try {
+    const spots = await Spot.find().populate("reviews.userId", "nom email");
+    // Transformer les données pour le frontend (nom -> name)
+    const transformedSpots = spots.map(spot => ({
+      id: spot._id,
+      name: spot.nom,
+      description: spot.description,
+      category: spot.category,
+      location: spot.location,
+      lat: spot.lat,
+      lng: spot.lng,
+      rating: spot.rating,
+      createdAt: spot.createdAt,
+      createdByName: spot.reviews && spot.reviews.length > 0 && spot.reviews[0].userId ? spot.reviews[0].userId.nom : null
+    }));
+    res.status(200).json({
+      spots: transformedSpots
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
 // ✅ GET un spot par ID
 router.get("/:id", async (req, res) => {
   try {

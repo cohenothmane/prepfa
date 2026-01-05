@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useImperativeHandle } from "react";
+import React, { useEffect, useState, useRef, useImperativeHandle, useMemo } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents, Circle } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -270,6 +270,92 @@ const Map = React.forwardRef(({ searchQuery = "", filters = {} }, ref) => {
     }
   };
 
+  // Fonction pour convertir la catégorie frontend vers backend
+  const mapCategoryToBackend = (category) => {
+    const categoryMap = {
+      'Tous': null,
+      'Restaurants': 'restaurant',
+      'Bar': 'bar',
+      'Cafes': 'café',
+      'VenteAEmporter': null,
+      'Livraison': null,
+      'Parc': null,
+      'SalleDeSport': null,
+      'Art': null,
+      'Attractions': null,
+      'VieNocturne': null,
+      'Concerts': null,
+      'Cinemas': null,
+      'Musees': null,
+      'Bibliotheques': null,
+      'Supermarche': null,
+      'Beaute': null,
+      'ConcessAuto': null,
+      'MaisonJardin': null,
+      'Vetements': null,
+      'CentresCommerciaux': null,
+      'Electronique': null,
+      'ArticlesSport': null,
+      'Hotels': null,
+      'DAB': null,
+      'SalonsBeaute': null,
+      'LocationVoiture': null,
+      'LavageAuto': null,
+      'Pressing': null,
+      'BornesRecharge': null,
+      'Carburant': null,
+      'Hopitaux': null,
+      'BibliothequesService': null,
+      'EnvoiCourrier': null,
+      'Parking': null,
+      'Pharmacies': null,
+    };
+    return categoryMap[category] !== undefined ? categoryMap[category] : category.toLowerCase();
+  };
+
+  // Calculer la distance entre deux points (formule de Haversine)
+  const calculateDistance = (lat1, lng1, lat2, lng2) => {
+    const R = 6371; // Rayon de la Terre en km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    const a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLng/2) * Math.sin(dLng/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  };
+
+  // Filtrer les spots selon les filtres (catégorie et rayon)
+  const filteredSpots = useMemo(() => {
+    let filtered = spots;
+
+    // Filtrer par catégorie
+    if (filters && filters.category && filters.category !== 'Tous') {
+      const backendCategory = mapCategoryToBackend(filters.category);
+      if (backendCategory) {
+        filtered = filtered.filter(spot => 
+          spot.category && spot.category.toLowerCase() === backendCategory.toLowerCase()
+        );
+      }
+    }
+
+    // Filtrer par rayon si activé et si position utilisateur disponible
+    if (filters && filters.radiusEnabled && filters.radius && userPosition) {
+      filtered = filtered.filter(spot => {
+        const distance = calculateDistance(
+          userPosition.lat,
+          userPosition.lng,
+          spot.lat,
+          spot.lng
+        );
+        return distance <= filters.radius;
+      });
+    }
+
+    return filtered;
+  }, [spots, filters, userPosition]);
+
   // Centre par défaut global si pas de position utilisateur
   const center = userPosition ? [userPosition.lat, userPosition.lng] : [20, 0];
 
@@ -306,7 +392,7 @@ const Map = React.forwardRef(({ searchQuery = "", filters = {} }, ref) => {
           </>
         )}
 
-        {spots.map((spot) => (
+        {filteredSpots.map((spot) => (
           <Marker 
             key={spot.id} 
             position={[spot.lat, spot.lng]}
@@ -368,7 +454,7 @@ const Map = React.forwardRef(({ searchQuery = "", filters = {} }, ref) => {
         </div>
       )}
       
-      {searchQuery && !selectedSpot && spots.length > 0 && (
+      {searchQuery && !selectedSpot && filteredSpots.length > 0 && (
         <div className="search-result-not-found">
           ✗ Aucun spot trouvé pour "{searchQuery}"
         </div>
