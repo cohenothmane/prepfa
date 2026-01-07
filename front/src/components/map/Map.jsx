@@ -150,12 +150,8 @@ const Map = React.forwardRef(({
 
   const fetchSpots = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const headers = token 
-        ? { "Authorization": `Bearer ${token}` }
-        : {};
-        
-      const response = await fetch("http://localhost:4000/api/spots", { headers });
+      // NE PAS envoyer le token pour récupérer TOUS les spots publics
+      const response = await fetch("http://localhost:4000/api/spots");
       const data = await response.json();
       if (response.ok && Array.isArray(data?.data)) {
         setSpots(data.data);
